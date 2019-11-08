@@ -1,143 +1,45 @@
 import React, { useEffect } from 'react';
-import './Map.css';
-import 'ol/ol.css';
-import Feature from 'ol/Feature';
+
+// OpenLayers libraries
 import Map from 'ol/Map';
 import View from 'ol/View';
-import { transform } from 'ol/proj';
-import GeoJSON from 'ol/format/GeoJSON';
-import Circle from 'ol/geom/Circle';
-import { Tile as TileLayer, Vector as VectorLayer } from 'ol/layer';
-import { OSM, Vector as VectorSource } from 'ol/source';
-import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
-import JsonOutline from './Us-Outline.json';
-import JsonStates from './Us-States.json';
-import JsonCounties from './US-counties.json';
-import JsonCongressional from './Us-Congressional.json';
-import Test from './test.json'
+import { Tile as TileLayer } from 'ol/layer';
+import { OSM } from 'ol/source';
 
+// JSON data
+import JsonOutline from '../../data/US-Outline.json';
+import JsonStates from '../../data/US-States.json';
+import JsonCounties from '../../data/US-Counties.json';
+import JsonCongressional from '../../data/US-Congressional.json';
 
+// Map Styling
+import { outline, states, congressional, counties } from './layerStyles';
+
+// Util
+import generateVectorLayer from '../../utils/generateVectorLayer';
+
+// CSS Styling
+import './Map.css';
+import 'ol/ol.css';
 
 function OLMap() {
 
-  const image = new CircleStyle({
-    radius: 5,
-    fill: null,
-    stroke: new Stroke({ color: 'red', width: 1 })
-  });
-  const styles = {
-    'LineString': new Style({
-      stroke: new Stroke({
-        color: 'rgba(43, 45, 66, 0.9)',
-        width: 1
-      })
-    })
-
-  };
-  const styles2 = {
-    'MultiPolygon': new Style({
-      stroke: new Stroke({
-        color: 'rgb(141,153,174 )',
-        width: 2
-      })
-    }),
-    'Polygon': new Style({
-      stroke: new Stroke({
-        color: 'rgb(141,153,174)',
-        width: 2
-      })
-    }),
-
-  };
-  const styles3 = {
-    'MultiPolygon': new Style({
-      stroke: new Stroke({
-        color: 'rgba(217,4,41, 0.7)',
-        width: 2
-      })
-
-    }),
-    'Polygon': new Style({
-      stroke: new Stroke({
-        color: 'rgba(217,4,41, 0.7)',
-        width: 2
-      })
-    }),
-
-  };
-  const styles4 = {
-    'MultiPolygon': new Style({
-      stroke: new Stroke({
-        color: 'rgba(239,35,60, 0.3)',
-        width: 1
-      })
-    }),
-    'Polygon': new Style({
-      stroke: new Stroke({
-        color: 'rgba(239,35,60, 0.3)',
-        width: 1
-      })
-    }),
-
-  };
-
+  // Generate map with layers
   useEffect(() => {
 
-    const styleFunction = function (feature) {
-      return styles[feature.getGeometry().getType()];
-    };
-    const styleFunction2 = function (feature) {
-      return styles2[feature.getGeometry().getType()];
-    }
-    const styleFunction3 = function (feature) {
-      return styles3[feature.getGeometry().getType()];
-    }
-    const styleFunction4 = function (feature) {
-      return styles4[feature.getGeometry().getType()];
-    }
+    // Map layers
+    const UsCongressional = generateVectorLayer(JsonCongressional, congressional);
+    const UsCounties = generateVectorLayer(JsonCounties, counties);
+    const UsStates = generateVectorLayer(JsonStates, states);
+    const UsOutline = generateVectorLayer(JsonOutline, outline);
 
-    const vectorSource = new VectorSource({
-      features: (new GeoJSON()).readFeatures(JsonOutline)
-    });
+    // Set layers as invisible for the map default
+    UsOutline.setVisible(!UsOutline.getVisible());
+    UsStates.setVisible(!UsStates.getVisible());
+    UsCounties.setVisible(!UsCounties.getVisible());
+    UsCongressional.setVisible(!UsCongressional.getVisible());
 
-    const UsOutline = new VectorLayer({
-      source: vectorSource,
-      style: styleFunction,
-
-    });
-
-
-    const vectorSource1 = new VectorSource({
-      features: (new GeoJSON()).readFeatures(JsonStates)
-    });
-
-    const UsStates = new VectorLayer({
-      source: vectorSource1,
-      style: styleFunction2,
-    });
-
-
-    const vectorSource2 = new VectorSource({
-      features: (new GeoJSON()).readFeatures(JsonCounties)
-    });
-
-    const UsCounties = new VectorLayer({
-      source: vectorSource2,
-      style: styleFunction4,
-
-    });
-
-
-    const vectorSource3 = new VectorSource({
-      features: (new GeoJSON()).readFeatures(JsonCongressional)
-    });
-
-    const UsCongressional = new VectorLayer({
-      source: vectorSource3,
-      style: styleFunction3,
-
-    });
-
+    // Generate OpenLayers map
     const map = new Map({
       layers: [
         new TileLayer({
@@ -147,19 +49,19 @@ function OLMap() {
         UsStates,
         UsCounties,
         UsOutline
-
-
       ],
       target: 'map',
       view: new View({
+        // Change the projection to set the the coords as LAT/LNG
         projection: 'EPSG:4326',
+        // Added this renderer for faster loading
         renderer: ('webgl'),
         center: [-97.922211, 39.381266],
-        zoom: 3
+        zoom: 4
       })
     });
 
-
+    // On every on click the button, the map updates with the selected outline
     document.getElementById('outline').onclick = function () {
       UsOutline.setVisible(!UsOutline.getVisible());
     };
@@ -172,7 +74,6 @@ function OLMap() {
     document.getElementById('congressional').onclick = function () {
       UsCongressional.setVisible(!UsCongressional.getVisible());
     };
-
 
   })
   return (
