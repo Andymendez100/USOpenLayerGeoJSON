@@ -29,7 +29,7 @@ function OLMap() {
     'LineString': new Style({
       stroke: new Stroke({
         color: 'rgba(43, 45, 66, 0.9)',
-        width: 2
+        width: 1
       })
     })
 
@@ -37,13 +37,13 @@ function OLMap() {
   const styles2 = {
     'MultiPolygon': new Style({
       stroke: new Stroke({
-        color: 'rgba(141,153,174 0.9)',
+        color: 'rgb(141,153,174 )',
         width: 2
       })
     }),
     'Polygon': new Style({
       stroke: new Stroke({
-        color: 'rgba(141,153,174, 0.9)',
+        color: 'rgb(141,153,174)',
         width: 2
       })
     }),
@@ -177,7 +177,7 @@ function OLMap() {
   })
   return (
     <div>
-      <h2></h2>
+      <h2>U.S.A Map Outline</h2>
       <button id="outline">Show US Outline</button>
       <button id="states">Show US States</button>
       <button id="counties">Show US Counties</button>
