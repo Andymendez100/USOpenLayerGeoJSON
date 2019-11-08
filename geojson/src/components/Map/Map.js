@@ -13,167 +13,175 @@ import { Circle as CircleStyle, Fill, Stroke, Style } from 'ol/style';
 import JsonOutline from './Us-Outline.json';
 import JsonStates from './Us-States.json';
 import JsonCounties from './US-counties.json';
-function OLMap() {
-  useEffect(() => {
-    var image = new CircleStyle({
-      radius: 5,
-      fill: null,
-      stroke: new Stroke({ color: 'red', width: 1 })
-    });
-    var styles = {
-      'Point': new Style({
-        image: image
-      }),
-      'LineString': new Style({
-        stroke: new Stroke({
-          color: 'red',
-          width: 10
-        })
-      }),
-      'MultiLineString': new Style({
-        stroke: new Stroke({
-          color: 'green',
-          width: 1
-        })
-      }),
-      'MultiPoint': new Style({
-        image: image
-      }),
-      'MultiPolygon': new Style({
-        stroke: new Stroke({
-          color: 'blue',
-          width: 3
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 0, 0.1)'
-        })
-      }),
-      'Polygon': new Style({
-        stroke: new Stroke({
-          color: 'blue',
-          width: 3
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 0, 0.1)'
-        })
-      }),
-      'GeometryCollection': new Style({
-        stroke: new Stroke({
-          color: 'magenta',
-          width: 2
-        }),
-        fill: new Fill({
-          color: 'magenta'
-        }),
-        image: new CircleStyle({
-          radius: 10,
-          fill: null,
-          stroke: new Stroke({
-            color: 'magenta'
-          })
-        })
-      }),
-      'Circle': new Style({
-        stroke: new Stroke({
-          color: 'red',
-          width: 2
-        }),
-        fill: new Fill({
-          color: 'rgba(255,0,0,0.2)'
-        })
-      })
-    };
-    var styles2 = {
-      'MultiPolygon': new Style({
-        stroke: new Stroke({
-          color: 'green',
-          width: 3
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 0, 0.1)'
-        })
-      }),
-      'Polygon': new Style({
-        stroke: new Stroke({
-          color: 'green',
-          width: 3
-        }),
-        fill: new Fill({
-          color: 'rgba(255, 255, 0, 0.1)'
-        })
-      }),
+import JsonCongressional from './Us-Congressional.json';
+import Test from './test.json'
 
-    };
-    var styleFunction = function (feature) {
+
+
+function OLMap() {
+
+  const image = new CircleStyle({
+    radius: 5,
+    fill: null,
+    stroke: new Stroke({ color: 'red', width: 1 })
+  });
+  const styles = {
+    'LineString': new Style({
+      stroke: new Stroke({
+        color: 'rgba(43, 45, 66, 0.9)',
+        width: 2
+      })
+    })
+
+  };
+  const styles2 = {
+    'MultiPolygon': new Style({
+      stroke: new Stroke({
+        color: 'rgba(141,153,174 0.9)',
+        width: 2
+      })
+    }),
+    'Polygon': new Style({
+      stroke: new Stroke({
+        color: 'rgba(141,153,174, 0.9)',
+        width: 2
+      })
+    }),
+
+  };
+  const styles3 = {
+    'MultiPolygon': new Style({
+      stroke: new Stroke({
+        color: 'rgba(217,4,41, 0.7)',
+        width: 2
+      })
+
+    }),
+    'Polygon': new Style({
+      stroke: new Stroke({
+        color: 'rgba(217,4,41, 0.7)',
+        width: 2
+      })
+    }),
+
+  };
+  const styles4 = {
+    'MultiPolygon': new Style({
+      stroke: new Stroke({
+        color: 'rgba(239,35,60, 0.3)',
+        width: 1
+      })
+    }),
+    'Polygon': new Style({
+      stroke: new Stroke({
+        color: 'rgba(239,35,60, 0.3)',
+        width: 1
+      })
+    }),
+
+  };
+
+  useEffect(() => {
+
+    const styleFunction = function (feature) {
       return styles[feature.getGeometry().getType()];
     };
-    var styleFunction2 = function (feature) {
+    const styleFunction2 = function (feature) {
       return styles2[feature.getGeometry().getType()];
     }
+    const styleFunction3 = function (feature) {
+      return styles3[feature.getGeometry().getType()];
+    }
+    const styleFunction4 = function (feature) {
+      return styles4[feature.getGeometry().getType()];
+    }
 
-    var vectorSource = new VectorSource({
+    const vectorSource = new VectorSource({
       features: (new GeoJSON()).readFeatures(JsonOutline)
     });
 
-    var UsOutline = new VectorLayer({
+    const UsOutline = new VectorLayer({
       source: vectorSource,
-      style: styleFunction
+      style: styleFunction,
+
     });
 
 
-    var vectorSource1 = new VectorSource({
+    const vectorSource1 = new VectorSource({
       features: (new GeoJSON()).readFeatures(JsonStates)
     });
 
-    var UsStates = new VectorLayer({
+    const UsStates = new VectorLayer({
       source: vectorSource1,
-      style: styleFunction2
+      style: styleFunction2,
     });
 
 
-    var vectorSource2 = new VectorSource({
+    const vectorSource2 = new VectorSource({
       features: (new GeoJSON()).readFeatures(JsonCounties)
     });
 
-    var UsCounties = new VectorLayer({
+    const UsCounties = new VectorLayer({
       source: vectorSource2,
-      style: styleFunction
+      style: styleFunction4,
+
     });
 
-    var map = new Map({
+
+    const vectorSource3 = new VectorSource({
+      features: (new GeoJSON()).readFeatures(JsonCongressional)
+    });
+
+    const UsCongressional = new VectorLayer({
+      source: vectorSource3,
+      style: styleFunction3,
+
+    });
+
+    const map = new Map({
       layers: [
         new TileLayer({
           source: new OSM()
         }),
-        UsOutline,
+        UsCongressional,
         UsStates,
-        UsCounties
+        UsCounties,
+        UsOutline
+
+
       ],
       target: 'map',
       view: new View({
         projection: 'EPSG:4326',
+        renderer: ('webgl'),
         center: [-97.922211, 39.381266],
-        zoom: 2
+        zoom: 3
       })
     });
-    document.getElementById('outline').onclick = function (value) {
+
+
+    document.getElementById('outline').onclick = function () {
       UsOutline.setVisible(!UsOutline.getVisible());
     };
-    document.getElementById('states').onclick = function (value) {
+    document.getElementById('states').onclick = function () {
       UsStates.setVisible(!UsStates.getVisible());
     };
-    document.getElementById('counties').onclick = function (value) {
+    document.getElementById('counties').onclick = function () {
       UsCounties.setVisible(!UsCounties.getVisible());
+    };
+    document.getElementById('congressional').onclick = function () {
+      UsCongressional.setVisible(!UsCongressional.getVisible());
     };
 
 
   })
   return (
     <div>
-      <h2>My Map</h2>
+      <h2></h2>
       <button id="outline">Show US Outline</button>
       <button id="states">Show US States</button>
       <button id="counties">Show US Counties</button>
+      <button id="congressional">Show US Congressional</button>
       <div id="map" className="map"></div>
     </div>
   )
